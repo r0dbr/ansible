@@ -1,0 +1,56 @@
+---
+- hosts: remote_ip_address
+  remote_user: remote_user
+  sudo: yes
+  vars:
+  - cliente: FAEL
+  - zabbix_host_groups : "HOSTGROUP"
+  - zabbix_agent_server: "ZABBIX-SERVER"
+  - zabbix_agent_server_port: 10051
+  - zabbix_proxy: "PROXYNAME"
+  - zabbix_http: "http://zabbix.company.com"
+  - zabbix_login_user: "admin"
+  - zabbix_login_password: "admin_pass"
+  tasks:
+    - name: Installing Zaabix-Agent 3.0 for Centos7
+      yum: 
+        name: http://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/zabbix-agent-3.0.9-1.el7.x86_64.rpm
+        state: present
+
+    - lineinfile: dest=/etc/zabbix/zabbix_agentd.conf regexp="{{ item.var }}=" line="{{ item.var }}={{ item.value }}"
+      with_items:
+        - { var: "ServerActive", value: "{{zabbix_agent_server}}:{{zabbix_agent_server_port}}"}
+        - { var: "Hostname", value: "{{ansible_hostname}}"}
+        - { var: "Server", value: "{{zabbix_agent_server}}"}
+        - { var: "HostMetadataItem", value: "system.uname"}
+        - { var: "RefreshActiveChecks", value: "60"}
+
+    - name: Starting zabbix services
+      service : name={{ item }} state=started enabled=yes
+      with_items:
+        zabbix-agent
+
+    - name: Adding configured host {{ansible_hostname}} on remote server
+      local_action:
+        module: zabbix_host
+        server_url: "{{zabbix_http}}"
+        login_user: "{{zabbix_login_user}}"
+        login_password: "{{zabbix_login_password}}"
+        host_name: "{{ansible_hostname}}"
+        visible_name: "{{cliente}} - {{ansible_hostname}}"
+        description: "{{cliente}} - {{ansible_hostname}}"
+        host_groups:
+          - "{{zabbix_host_groups}}"
+        link_templates:
+          - "Linux Template"
+        status: enabled
+        state: present
+        inventory_mode: manual
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: "{{ ansible_eth0.ipv4.address }}"
+            dns: ""
+            port: 10050
+        proxy: "{{zabbix_proxy}}"
