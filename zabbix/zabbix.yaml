@@ -3,7 +3,7 @@
   remote_user: remote_user
   sudo: yes
   vars:
-  - cliente: FAEL
+  - cliente: CLIENT
   - zabbix_host_groups : "HOSTGROUP"
   - zabbix_agent_server: "ZABBIX-SERVER"
   - zabbix_agent_server_port: 10051
