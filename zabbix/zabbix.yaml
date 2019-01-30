@@ -24,6 +24,10 @@
         - { var: "Server", value: "{{zabbix_agent_server}}"}
         - { var: "HostMetadataItem", value: "system.uname"}
         - { var: "RefreshActiveChecks", value: "60"}
+    - name: Configurando template php-fpm
+      template:
+        src: zabbix_agentd.d/php-fpm.j2
+        dest: /etc/zabbix/zabbix_agentd.d/php-fpm.conf
 
     - name: Starting zabbix services
       service : name={{ item }} state=started enabled=yes

@@ -1,0 +1,4 @@
+#PHP FPM WSU
+UserParameter=phpfpm.process,/bin/ps aux | /bin/grep php-fpm | /bin/grep -v "\(root\|grep\)" | /bin/awk '{sum+=$6; ++n} END {print n}'
+UserParameter=phpfpm.total_ram,/bin/ps aux | /bin/grep php-fpm | /bin/grep -v "\(root\|grep\)" | /bin/awk '{sum+=$6; ++n} END {print sum}'
+UserParameter=phpfpm.avg_ram,/bin/ps aux | /bin/grep php-fpm | /bin/grep -v "\(root\|grep\)" | /bin/awk '{sum+=$6; ++n} END {print sum/n}'

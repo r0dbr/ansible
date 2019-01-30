@@ -1,0 +1,23 @@
+---
+- hosts: zabbix
+  remote_user: rodrigo.carvalho
+  sudo: yes
+  vars:
+  - registry: "10.142.0.5"
+  tasks:
+    - name:  Downloading 
+      shell: wget https://my-netdata.io/kickstart.sh 
+      chdir: /usr/src
+
+    - name: Installing netdata 
+      shell: bash kickstart.sh 
+      chdir: /usr/src
+
+    - lineinfile: dest=/etc/netdata/netdata.confregexp="{{ item.var }}=" line="{{ item.var }}={{ item.value }}"
+      with_items:
+        - { var: "registry to announcee", value: "{{registry}}"}
+
+    - name: Starting zabbix services
+      service : name={{ item }} state=started enabled=yes
+      with_items:
+        netdata
