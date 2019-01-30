@@ -7,7 +7,7 @@
   tasks:
     - name:  Downloading 
       shell: wget https://my-netdata.io/kickstart.sh 
-      chdir: /usr/src
+      chdir: /usr/src/
 
     - name: Installing netdata 
       shell: bash kickstart.sh 
